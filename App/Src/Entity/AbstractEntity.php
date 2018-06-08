@@ -104,11 +104,19 @@ abstract class AbstractEntity
      */
     public function findOneById($id)
     {
-        $aRet = $this->select(array('id' => $id));
+        $sSQL = "SELECT * FROM {$this->table} WHERE id = {$id}";
+        $this->sql = $sSQL;
+        $sth = $this->db->prepare($this->sql);
+
+        $sth->execute();
+        $aRet = $sth->fetch(\PDO::FETCH_ASSOC);
+
         if ($aRet) {
-            return $aRet[0];
+            foreach(array_keys($aRet) as $key => $value) {
+                $this->$value = $aRet[$value];
+            }
         }
-        return array();
+        return $this;
     }
     
     /**
